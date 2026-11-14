@@ -1,1 +1,2 @@
-Creator: Struglix \n Support: LuaU, C++, Python / Test
+Creator: Struglix
+Support: LuaU, C++, Python / Test
