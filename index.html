@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Studio - C++ | Python | Lua</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1e1e1e;--panel:#252526;--border:#2d2d2d;--text:#d4d4d4;--muted:#858585;--accent:#007acc;--kw:#569cd6;--str:#ce9178;--com:#6a9955;--num:#b5cea8;--func:#dcdcaa;--type:#4ec9b0;--op:#d4d4d4;--pre:#c586c0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;font-size:12px}
+header{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap}
+header b{font-size:13px;color:#fff;display:flex;align-items:center;gap:6px} header b span{color:#4fc3f7}
+.file{font-size:12px;color:var(--text);border:1px solid var(--border);background:var(--bg);padding:4px 8px;border-radius:3px;width:140px}
+.toolbar{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.tabs button{border:0;background:transparent;color:var(--text);padding:4px 10px;cursor:pointer;font-size:12px;font-weight:600}
+.tabs button.active{background:var(--accent);color:#fff}
+button.btn{border:1px solid var(--border);background:var(--bg);color:var(--text);padding:4px 8px;border-radius:3px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+button.btn:hover{border-color:#555}
+button.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.icon{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon.fill{fill:currentColor;stroke:none}
+.icon.logo{width:16px;height:16px;color:#4fc3f7}
+.theme-group{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.theme-group button{border:0;background:transparent;color:var(--text);padding:4px 8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap}
+.theme-group button.active{background:var(--accent);color:#fff}
+main{display:flex;flex:1;min-height:0}
+aside{width:180px;background:var(--panel);border-right:1px solid var(--border);overflow:auto;padding:8px;display:none}
+aside.open{display:block}
+@media(min-width:900px){aside{display:block}}
+aside h3{font-size:11px;text-transform:uppercase;color:var(--muted);margin:10px 0 6px;display:flex;align-items:center;gap:5px}
+.ex{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:var(--text);padding:5px 7px;border-radius:3px;cursor:pointer;display:flex;justify-content:space-between;font-size:12px}
+.ex:hover,.ex.active{background:#37373d}
+.editor-wrap{flex:1;display:flex;flex-direction:column;min-width:0}
+.editor{position:relative;flex:1;background:var(--bg);overflow:hidden;min-height:260px}
+.linenos{position:absolute;left:0;top:0;bottom:0;width:34px;background:var(--bg);color:var(--muted);font-family:Consolas,monospace;font-size:13px;line-height:1.5;padding:8px 4px 8px 0;text-align:right;overflow:hidden;white-space:pre;z-index:3}
+pre.hl{position:absolute;left:34px;top:0;right:0;bottom:0;font-family:Consolas,monospace;font-size:13px;line-height:1.5;padding:8px 8px 8px 6px;white-space:pre;overflow:hidden;color:var(--text);pointer-events:none;z-index:1;margin:0}
+textarea.code{position:absolute;left:34px;top:0;width:calc(100% - 34px);height:100%;background:transparent;color:transparent;caret-color:#fff;font-family:Consolas,monospace;font-size:13px;line-height:1.5;padding:8px 8px 8px 6px;border:0;outline:none;resize:none;white-space:pre;overflow:auto;z-index:2}
+.tok-kw{color:var(--kw)} .tok-str{color:var(--str)} .tok-com{color:var(--com);font-style:italic} .tok-num{color:var(--num)} .tok-func{color:var(--func)} .tok-type{color:var(--type)} .tok-op{color:var(--op)} .tok-pre{color:var(--pre);font-weight:600}
+.status{padding:4px 10px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);display:flex;gap:10px}
+.console{background:var(--panel);border-top:1px solid var(--border);height:80px;display:flex;flex-direction:column}
+.console-head{display:flex;justify-content:space-between;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700}
+.console pre{padding:6px 10px;overflow:auto;white-space:pre-wrap;font-family:Consolas,monospace;font-size:12px;flex:1}
+.pastefy-bar{display:none;align-items:center;gap:8px;padding:6px 10px;background:#0f3a1a;border-bottom:1px solid #1a5a2a;font-size:12px;flex-wrap:wrap}
+.pastefy-bar.show{display:flex}
+.pastefy-bar input{flex:1;min-width:180px;background:#111;color:#fff;border:1px solid #333;padding:4px 6px;border-radius:3px;font-size:12px}
+.syn{display:none;padding:8px 10px;background:var(--panel);border-top:1px solid var(--border)}
+.syn.show{display:block}
+.syn-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.syn-head h3{font-size:12px;flex:1}
+.syn-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.syn-tabs button{border:0;background:transparent;color:var(--text);padding:4px 10px;cursor:pointer;font-size:12px;font-weight:600}
+.syn-tabs button.active{background:var(--accent);color:#fff}
+.syn-panel{display:none} .syn-panel.active{display:block}
+.syn-card{border:1px solid var(--border);border-radius:3px;overflow:hidden;background:var(--bg)}
+.syn-card table{width:100%;border-collapse:collapse;font-size:12px}
+.syn-card th,.syn-card td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.syn-card th{color:var(--muted);font-size:11px;text-transform:uppercase}
+.syn-card td code{font-family:Consolas,monospace;background:var(--panel);padding:1px 5px;border-radius:3px;white-space:pre-wrap;word-break:break-word}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#fff;color:#111;padding:8px 14px;border-radius:5px;font-size:12px;font-weight:600;display:none;z-index:99;max-width:90%;text-align:center}
+body.fullscreen-code header, body.fullscreen-code .toolbar, body.fullscreen-code aside, body.fullscreen-code .console, body.fullscreen-code .syn, body.fullscreen-code .status, body.fullscreen-code .pastefy-bar{display:none !important}
+body.fullscreen-code .editor{height:100dvh}
+.fs-bar{display:none}
+body.fullscreen-code .fs-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--panel);border-bottom:1px solid var(--border)}
+</style>
+</head>
+<body>
+<header>
+<button class="btn" onclick="toggleSidebar()" title="Menu"><svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+<b><svg class="icon logo" viewBox="0 0 24 24"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>Code <span>Studio</span></b>
+<input id="filename" class="file" value="hello_world.py">
+<div style="flex:1"></div>
+<button class="btn primary" onclick="runCode()"><svg class="icon fill" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>Chạy</button>
+<button class="btn primary" onclick="downloadCode()"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg>Tải</button>
+<button class="btn primary" onclick="pastefyRaw()" id="pastefyBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Pastefy Raw</button>
+</header>
+<div class="toolbar">
+<div class="tabs"><button id="tab-cpp" onclick="setLang('cpp')">C++</button><button id="tab-python" class="active" onclick="setLang('python')">Python</button><button id="tab-lua" onclick="setLang('lua')">Lua</button></div>
+<button class="btn" onclick="formatCode()"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Format</button>
+<button class="btn" onclick="copyCode()"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>Copy</button>
+<button class="btn" onclick="toggleFullscreen()" id="fsBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg>Phóng to</button>
+<button class="btn" onclick="toggleSyn()" id="synBtn">Cú pháp</button>
+<div class="theme-group" title="Giao diện - bấm để đổi, không phải select"><button id="th-vscode" class="active" onclick="setTheme('vscode')">VS Code</button><button id="th-onedark" onclick="setTheme('onedark')">One Dark</button><button id="th-dracula" onclick="setTheme('dracula')">Dracula</button><button id="th-tokyo" onclick="setTheme('tokyo')">Tokyo</button></div>
+<label class="btn" style="cursor:pointer"><svg class="icon" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>Mở file<input type="file" id="fileInput" accept=".cpp,.py,.lua,.txt" style="display:none"></label>
+</div>
+<div class="pastefy-bar" id="pastefyBar"><span><b>Pastefy Raw:</b></span><input id="pastefyLink" readonly><button class="btn" onclick="copyPastefyLink()">Copy link</button><button class="btn" onclick="openPastefyRaw()">Mở Raw</button><button class="btn" onclick="copyCode()">Copy code</button><button class="btn" onclick="document.getElementById('pastefyBar').classList.remove('show')">Đóng</button></div>
+<div class="fs-bar"><b><span id="fsName">hello_world.py</span></b><div style="flex:1"></div><button class="btn" onclick="runCode()">Chạy</button><button class="btn" onclick="pastefyRaw()">Pastefy Raw</button><button class="btn" onclick="toggleFullscreen()">Thu nhỏ</button></div>
+<main>
+<aside id="sidebar">
+<h3>Python</h3>
+<button class="ex" onclick="loadEx('python','hello',this)">Hello World <small>.py</small></button>
+<button class="ex" onclick="loadEx('python','loop',this)">Vòng lặp <small>.py</small></button>
+<button class="ex" onclick="loadEx('python','func',this)">Hàm + If <small>.py</small></button>
+<h3>C++</h3>
+<button class="ex" onclick="loadEx('cpp','hello',this)">Hello World <small>.cpp</small></button>
+<button class="ex" onclick="loadEx('cpp','loop',this)">Vòng lặp <small>.cpp</small></button>
+<button class="ex" onclick="loadEx('cpp','func',this)">Hàm + If <small>.cpp</small></button>
+<h3>Lua</h3>
+<button class="ex" onclick="loadEx('lua','hello',this)">Hello World <small>.lua</small></button>
+<button class="ex" onclick="loadEx('lua','loop',this)">Vòng lặp <small>.lua</small></button>
+<button class="ex" onclick="loadEx('lua','func',this)">Hàm + If <small>.lua</small></button>
+<p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">Comment: C++ <b style="color:var(--text)">//</b> • Python <b style="color:var(--text)">#</b> • Lua <b style="color:var(--text)">--</b><br># trong C++ là #include, # trong Lua là độ dài.</p>
+</aside>
+<div class="editor-wrap">
+<div class="editor" id="editorBox">
+<div class="linenos" id="linenos">1</div>
+<pre class="hl" id="hl"></pre>
+<textarea id="code" class="code" spellcheck="false" placeholder="# Viết code Python ở đây..."># Chuong trinh dau tien
+print("Hello, Code Studio!")
+for i in range(1, 6):
+    if i % 2 == 0:
+        print(i, "la so chan")
+    else:
+        print(i, "la so le")
+def tong(a, b):
+    return a + b
+print("Tong =", tong(10, 20))</textarea>
+</div>
+<div class="status"><span id="stLang">Python</span><span id="stLines">10 dòng</span><span id="stChars">0 ký tự</span><span id="stPos">Dòng 1, Cột 1</span><span id="stTheme">Giao diện: VS Code</span></div>
+<div class="console"><div class="console-head"><span>Console</span><button class="btn" onclick="clearOut()">Xóa</button></div><pre id="out">Nhấn "Chạy" để xem kết quả. Nhấn "Pastefy Raw" để tạo link raw thật.</pre></div>
+</div>
+</main>
+<div class="syn" id="synBox">
+<div class="syn-head"><h3>Cú pháp riêng từng ngôn ngữ</h3><div class="syn-tabs"><button id="syn-tab-cpp" onclick="showSyn('cpp')">C++</button><button id="syn-tab-python" class="active" onclick="showSyn('python')">Python</button><button id="syn-tab-lua" onclick="showSyn('lua')">Lua</button></div><button class="btn" onclick="toggleSyn()">Ẩn</button></div>
+<div id="syn-python" class="syn-panel active"><div class="syn-card"><table><tr><th>Chức năng</th><th>Cú pháp Python</th></tr>
+<tr><td><b>Comment</b></td><td><code># comment</code></td></tr>
+<tr><td><b>In ra</b></td><td><code>print("Hello")</code></td></tr>
+<tr><td><b>Biến</b></td><td><code>x = 10</code></td></tr>
+<tr><td><b>If</b></td><td><code>if x &gt; 5:\n    print("lon")\nelse:\n    print("nho")</code></td></tr>
+<tr><td><b>For</b></td><td><code>for i in range(5):\n    print(i)</code></td></tr>
+<tr><td><b>Hàm</b></td><td><code>def tong(a, b):\n    return a + b</code></td></tr>
+</table></div></div>
+<div id="syn-cpp" class="syn-panel"><div class="syn-card"><table><tr><th>Chức năng</th><th>Cú pháp C++</th></tr>
+<tr><td><b>Comment</b></td><td><code>// comment</code> — KHÔNG phải #</td></tr>
+<tr><td><b>Preprocessor</b></td><td><code>#include &lt;iostream&gt;</code></td></tr>
+<tr><td><b>In ra</b></td><td><code>cout &lt;&lt; "Hello" &lt;&lt; endl;</code></td></tr>
+<tr><td><b>Biến</b></td><td><code>int x = 10;</code></td></tr>
+<tr><td><b>If</b></td><td><code>if (x &gt; 5) {\n    cout &lt;&lt; "lon";\n}</code></td></tr>
+<tr><td><b>For</b></td><td><code>for (int i = 0; i &lt; 5; i++) {\n    cout &lt;&lt; i;\n}</code></td></tr>
+<tr><td><b>Hàm</b></td><td><code>int tong(int a, int b) {\n    return a + b;\n}</code></td></tr>
+</table></div></div>
+<div id="syn-lua" class="syn-panel"><div class="syn-card"><table><tr><th>Chức năng</th><th>Cú pháp Lua</th></tr>
+<tr><td><b>Comment</b></td><td><code>-- comment</code></td></tr>
+<tr><td><b>Toán tử #</b></td><td><code>print(#ds)</code> — # là độ dài, không phải comment</td></tr>
+<tr><td><b>In ra</b></td><td><code>print("Hello")</code></td></tr>
+<tr><td><b>Biến</b></td><td><code>local x = 10</code></td></tr>
+<tr><td><b>If</b></td><td><code>if x &gt; 5 then\n    print("lon")\nend</code></td></tr>
+<tr><td><b>For</b></td><td><code>for i = 1, 5 do\n    print(i)\nend</code></td></tr>
+<tr><td><b>Hàm</b></td><td><code>local function tong(a, b)\n    return a + b\nend</code></td></tr>
+</table></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const PASTEFY_KEY = "1sA01pKhhXDtAaTmUgOcexdVjsXWrPmC3M1zLRzHDukxQr9imEuRf1aXKiFZ";
+const EXAMPLES={
+python:{hello:'# Chuong trinh dau tien\nprint("Hello, Code Studio!")\nfor i in range(1, 6):\n    if i % 2 == 0:\n        print(i, "la so chan")\n    else:\n        print(i, "la so le")\n\ndef tong(a, b):\n    return a + b\nprint("Tong =", tong(10, 20))',
+loop:'# Vong lap Python\nfor i in range(1, 11):\n    print(i)\nx = 0\nwhile x < 5:\n    print("while", x)\n    x += 1',
+func:'# Ham + If Python\ndef kiem_tra(diem):\n    if diem >= 8:\n        return "Gioi"\n    elif diem >= 5:\n        return "Kha"\n    else:\n        return "Can co gang"\nprint(kiem_tra(9))\nprint(kiem_tra(6))'},
+cpp:{hello:'// Chuong trinh dau tien C++\n#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello, Code Studio!" << endl;\n    for (int i = 1; i <= 5; i++) {\n        if (i % 2 == 0) cout << i << " chan" << endl;\n        else cout << i << " le" << endl;\n    }\n    return 0;\n}',
+loop:'// Vong lap C++\n#include <iostream>\nusing namespace std;\nint main(){\n    for(int i=1;i<=10;i++) cout<<i<<" ";\n    cout<<endl;\n    return 0;\n}',
+func:'// Ham + If C++\n#include <iostream>\n#include <string>\nusing namespace std;\nstring kiem_tra(int diem){\n    if(diem>=8) return "Gioi";\n    else if(diem>=5) return "Kha";\n    else return "Can co gang";\n}\nint main(){ cout<<kiem_tra(9)<<endl; return 0; }'},
+lua:{hello:'-- Chuong trinh dau tien Lua\nprint("Hello, Code Studio!")\nlocal tong = 0\nfor i = 1, 5 do\n    if i % 2 == 0 then print(i, "chan") else print(i, "le") end\n    tong = tong + i\nend\nprint("Tong =", tong)\nprint("Do dai =", #ds)',
+loop:'-- Vong lap Lua\nfor i = 1, 10 do print(i) end\nlocal x = 0\nwhile x < 5 do print("while", x) x = x + 1 end',
+func:'-- Ham + If Lua\nlocal function kiem_tra(diem)\n    if diem >= 8 then return "Gioi"\n    elseif diem >= 5 then return "Kha"\n    else return "Can co gang" end\nend\nprint(kiem_tra(9))'}
+};
+let lang='python'; let isFullscreen=false; let lastPastefyRaw=''; let currentTheme='vscode';
+const ta=document.getElementById('code'), hl=document.getElementById('hl'), linenos=document.getElementById('linenos'), out=document.getElementById('out');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function highlight(code){
+  var e = esc(code);
+  if(lang==='cpp'){
+    return e.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|(#\s*\w+[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?)\b|\b(using|namespace|int|string|cout|cin|endl|return|if|else|for|while|void|bool|char|double|float|class|public|private|const)\b|\b([A-Za-z_][A-Za-z0-9_]*)(?=\()/g, function(m,com,pre,str,num,kw,fn){
+      if(com) return '<span class="tok-com">'+com+'</span>';
+      if(pre) return '<span class="tok-pre">'+pre+'</span>';
+      if(str) return '<span class="tok-str">'+str+'</span>';
+      if(num) return '<span class="tok-num">'+num+'</span>';
+      if(kw) return '<span class="tok-kw">'+kw+'</span>';
+      if(fn) return '<span class="tok-func">'+fn+'</span>';
+      return m;
+    });
+  }
+  if(lang==='python'){
+    return e.replace(/(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?)\b|\b(def|print|if|elif|else|for|while|return|import|from|as|class|in|range|and|or|not|True|False|None)\b|\b([A-Za-z_][A-Za-z0-9_]*)(?=\()/g, function(m,com,str,num,kw,fn){
+      if(com) return '<span class="tok-com">'+com+'</span>';
+      if(str) return '<span class="tok-str">'+str+'</span>';
+      if(num) return '<span class="tok-num">'+num+'</span>';
+      if(kw) return '<span class="tok-kw">'+kw+'</span>';
+      if(fn) return '<span class="tok-func">'+fn+'</span>';
+      return m;
+    });
+  }
+  return e.replace(/(--\[\[[\s\S]*?\]\]|--[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?)\b|\b(local|function|print|if|then|else|elseif|end|for|while|do|return|pairs|ipairs|in|and|or|not|true|false|nil)\b|\b([A-Za-z_][A-Za-z0-9_]*)(?=\()|(#)/g, function(m,com,str,num,kw,fn,op){
+    if(com) return '<span class="tok-com">'+com+'</span>';
+    if(str) return '<span class="tok-str">'+str+'</span>';
+    if(num) return '<span class="tok-num">'+num+'</span>';
+    if(kw) return '<span class="tok-kw">'+kw+'</span>';
+    if(fn) return '<span class="tok-func">'+fn+'</span>';
+    if(op) return '<span class="tok-op">'+op+'</span>';
+    return m;
+  });
+}
+function refresh(){
+  hl.innerHTML=highlight(ta.value)+'\n';
+  const lines=ta.value.split('\n').length; let nums=''; for(let i=1;i<=lines;i++) nums+=i+'\n'; linenos.textContent=nums;
+  document.getElementById('stLines').textContent=lines+' dòng';
+  document.getElementById('stChars').textContent=ta.value.length+' ký tự';
+  const pos=ta.selectionStart||0; const before=ta.value.slice(0,pos); const l=before.split('\n').length; const c=pos-before.lastIndexOf('\n');
+  document.getElementById('stPos').textContent='Dòng '+l+', Cột '+c;
+  document.getElementById('fsName').textContent=document.getElementById('filename').value;
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function toggleSyn(){ const box=document.getElementById('synBox'); const show=box.classList.toggle('show'); document.getElementById('synBtn').textContent=show?'Ẩn cú pháp':'Cú pháp'; }
+function showSyn(l){ document.querySelectorAll('.syn-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.syn-tabs button').forEach(b=>b.classList.remove('active')); document.getElementById('syn-'+l).classList.add('active'); document.getElementById('syn-tab-'+l).classList.add('active'); }
+function toggleFullscreen(){ isFullscreen=!isFullscreen; document.body.classList.toggle('fullscreen-code',isFullscreen); document.getElementById('fsBtn').textContent=isFullscreen?'Thu nhỏ':'Phóng to'; if(isFullscreen) showToast('Đã phóng to — bấm Thu nhỏ hoặc Esc'); ta.focus(); refresh(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && isFullscreen) toggleFullscreen(); });
+ta.addEventListener('input',refresh); ta.addEventListener('click',refresh); ta.addEventListener('keyup',refresh);
+ta.addEventListener('scroll',()=>{hl.scrollTop=ta.scrollTop; hl.scrollLeft=ta.scrollLeft; linenos.scrollTop=ta.scrollTop});
+document.getElementById('editorBox').addEventListener('click',e=>{ if(e.target!==ta) ta.focus(); });
+function wordBefore(pos){ const before=ta.value.slice(0,pos); const m=before.match(/([A-Za-z_][A-Za-z0-9_]*)$/); return m?m[1]:''; }
+ta.addEventListener('keydown',e=>{
+  const s=ta.selectionStart, en=ta.selectionEnd;
+  if(e.key==='Tab'){ e.preventDefault(); ta.value=ta.value.slice(0,s)+'    '+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+4; refresh(); return; }
+  if(e.key==='Enter'){ e.preventDefault(); const lineStart=ta.value.lastIndexOf('\n',s-1)+1; const line=ta.value.slice(lineStart,s); const indent=(line.match(/^\s*/) || [''])[0]; const t=line.trim(); let extra=''; if(t.endsWith('{')||t.endsWith(':')||t.endsWith('then')||t.endsWith('do')) extra='    '; const ni=indent+extra; ta.value=ta.value.slice(0,s)+'\n'+ni+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1+ni.length; refresh(); return; }
+  if(e.key===','){ e.preventDefault(); const after=ta.value.slice(en); if(after.startsWith(' ')){ ta.value=ta.value.slice(0,s)+','+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1; } else { ta.value=ta.value.slice(0,s)+', '+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+2; } refresh(); return; }
+  if(['=','+','*','%'].includes(e.key)){ const before=ta.value.slice(0,s); const after=ta.value.slice(en); if(before.endsWith('==')||before.endsWith('>=')||before.endsWith('<=')||before.endsWith('!=')) return; e.preventDefault(); let b=before, a=after; if(b.endsWith(' ')) b=b.slice(0,-1); if(a.startsWith(' ')) a=a.slice(1); const needBefore=b!=='' && !/[\\(\\[\\{,\\n]$/.test(b.slice(-1)); const ins=(needBefore?' ':'')+e.key+' '; ta.value=b+ins+a; ta.selectionStart=ta.selectionEnd=b.length+ins.length; refresh(); return; }
+  if(e.key==='('){ const w=wordBefore(s); if(['if','for','while','elif','switch','catch','return'].includes(w)){ e.preventDefault(); const before=ta.value.slice(0,s); const needSpace=!before.endsWith(' '); ta.value=before+(needSpace?' ':'')+'()'+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+(needSpace?1:0)+1; refresh(); return; } e.preventDefault(); ta.value=ta.value.slice(0,s)+'()'+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1; refresh(); return; }
+  if(e.key==='['){ e.preventDefault(); ta.value=ta.value.slice(0,s)+'[]'+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1; refresh(); return; }
+  if(e.key==='{'){ e.preventDefault(); ta.value=ta.value.slice(0,s)+'{}'+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1; refresh(); return; }
+  if(e.key==='"' || e.key==="'"){ if(ta.value[en]===e.key){ e.preventDefault(); ta.selectionStart=ta.selectionEnd=en+1; refresh(); return; } e.preventDefault(); ta.value=ta.value.slice(0,s)+e.key+e.key+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+1; refresh(); return; }
+  if(e.key===')' || e.key===']' || e.key==='}'){ if(ta.value[en]===e.key){ e.preventDefault(); ta.selectionStart=ta.selectionEnd=en+1; refresh(); return; } }
+});
+// FORMAT CHUẨN - FIX: bảo vệ string bằng placeholder, bảo vệ << >> == != >= <= .. ++ -- :: ->
+function splitComment(line){
+  let inS=false, inD=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==="'" && !inD && line[i-1]!=='\\') inS=!inS;
+    if(c==='"' && !inS && line[i-1]!=='\\') inD=!inD;
+    if(!inS && !inD){
+      if(lang==='python' && c==='#') return [line.slice(0,i), line.slice(i)];
+      if(lang==='cpp' && c==='/' && line[i+1]==='/') return [line.slice(0,i), line.slice(i)];
+      if(lang==='lua' && c==='-' && line[i+1]==='-') return [line.slice(0,i), line.slice(i)];
+    }
+  }
+  return [line, ''];
+}
+function formatOperators(code){
+  if(!code.trim()) return code;
+  // 1. Tách string ra placeholder, không đụng vào nội dung string
+  const strs=[]; let s=code.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, function(m){ strs.push(m); return '\u0000STR'+(strs.length-1)+'\u0000'; });
+  // 2. Bảo vệ toán tử dài
+  const ops={'<<':'\u0001','>>':'\u0002','==':'\u0003','!=':'\u0004','>=':'\u0005','<=':'\u0006','~=  ':'\u0007','+=':'\u0008','-=':'\u0009','*=':'\u0010','/=':'\u0011','%=':'\u0012','++':'\u0013','--':'\u0014','::':'\u0015','..':'\u0016','->':'\u0017','~=':'\u0018'};
+  // làm ~= trước vì có space trong key lỗi, sửa lại
+  s=s.replace(/~=/g, '\u0018');
+  Object.keys(ops).forEach(k=>{ if(k.trim()==='~=' ) return; const escK=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); s=s.replace(new RegExp(escK,'g'), ops[k]); });
+  // 3. Format toán tử đơn - giờ << >> == ... đã an toàn
+  s=s.replace(/\s*=\s*/g,' = ').replace(/\s*\+\s*/g,' + ').replace(/\s*-\s*/g,' - ').replace(/\s*\*\s*/g,' * ').replace(/\s*\/\s*/g,' / ').replace(/\s*%\s*/g,' % ');
+  s=s.replace(/\s*>\s*/g,' > ').replace(/\s*<\s*/g,' < ');
+  s=s.replace(/\s*,\s*/g,', ').replace(/\s*:\s*/g,': ').replace(/\s*;\s*/g,'; ');
+  s=s.replace(/\s*\(\s*/g,'(').replace(/\s*\)/g,')').replace(/\s*\[\s*/g,'[').replace(/\s*\]/g,']');
+  s=s.replace(/\s+/g,' ');
+  s=s.replace(/\b(if|for|while|elif|return|switch|catch)\(/g,'$1 (');
+  s=s.replace(/\s+;/g,';').replace(/\s+,/g,',');
+  // 4. Khôi phục toán tử dài
+  Object.keys(ops).forEach(k=>{ const v=ops[k]; const name=k.trim(); s=s.split(v).join(' '+name+' '); });
+  s=s.replace(/\s+/g,' ').trim();
+  // 5. Khôi phục string
+  strs.forEach((orig,i)=>{ s=s.replace('\u0000STR'+i+'\u0000', orig); });
+  // sửa lại: << >> cần không có space thừa trước ; và sau (
+  s=s.replace(/\(\s+<</g,'(<<').replace(/>>\s+\)/g,'>>)');
+  return s.trim();
+}
+function formatCode(){
+  const lines=ta.value.split('\n');
+  let out=[]; let indent=0;
+  for(let raw of lines){
+    let line=raw.trim();
+    if(line===''){ out.push(''); continue; }
+    const parts=splitComment(line); let codePart=parts[0]; let commentPart=parts[1];
+    if(lang==='cpp' && codePart.trim().startsWith('#')){ out.push(codePart.trim() + (commentPart?(' '+commentPart):'')); continue; }
+    const low=codePart.trim();
+    if(lang==='python' && /^(else|elif|except|finally)\b/.test(low)) indent=Math.max(0,indent-1);
+    if(lang==='cpp' && low.startsWith('}')) indent=Math.max(0,indent-1);
+    if(lang==='lua' && /^(end|else|elseif)\b/.test(low)) indent=Math.max(0,indent-1);
+    let formatted=formatOperators(codePart);
+    let full='    '.repeat(indent)+formatted + (commentPart ? ' ' + commentPart.trim() : '');
+    out.push(full);
+    if(lang==='python' && /:\s*(#.*)?$/.test(formatted)) indent++;
+    if(lang==='cpp' && formatted.endsWith('{')) indent++;
+    if(lang==='lua' && /\b(then|do|function)\s*(--.*)?$/.test(formatted)) indent++;
+  }
+  ta.value=out.join('\n').replace(/\n{3,}/g,'\n\n');
+  refresh(); showToast('Đã Format chuẩn');
+}
+function setLang(l){lang=l; document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active')); document.getElementById('tab-'+l).classList.add('active'); document.getElementById('stLang').textContent=l==='cpp'?'C++':l==='python'?'Python':'Lua'; const fn=document.getElementById('filename'); const base=(fn.value.split('.')[0]||'main'); fn.value=l==='cpp'?base+'.cpp':l==='python'?base+'.py':base+'.lua'; ta.placeholder=l==='cpp'?'// Viết code C++ ở đây...':l==='python'?'# Viết code Python ở đây...':'-- Viết code Lua ở đây...'; refresh(); ta.focus()}
+function loadEx(l,key,btn){setLang(l); ta.value=EXAMPLES[l][key]; document.querySelectorAll('.ex').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); refresh(); ta.focus(); showToast('Đã load: '+key)}
+function copyCode(){navigator.clipboard.writeText(ta.value).then(()=>showToast('Đã copy code')).catch(()=>showToast('Copy thất bại, hãy chọn tay'))}
+function setTheme(t){
+  currentTheme=t;
+  const map={
+    vscode:{bg:'#1e1e1e',panel:'#252526',border:'#2d2d2d',text:'#d4d4d4',muted:'#858585',accent:'#007acc',kw:'#569cd6',str:'#ce9178',com:'#6a9955',num:'#b5cea8',func:'#dcdcaa',type:'#4ec9b0',op:'#d4d4d4',pre:'#c586c0',name:'VS Code'},
+    onedark:{bg:'#282c34',panel:'#21252b',border:'#3a3f4b',text:'#abb2bf',muted:'#5c6370',accent:'#61afef',kw:'#c678dd',str:'#98c379',com:'#5c6370',num:'#d19a66',func:'#61afef',type:'#e5c07b',op:'#56b6c2',pre:'#e5c07b',name:'One Dark'},
+    dracula:{bg:'#282a36',panel:'#21222c',border:'#44475a',text:'#f8f8f2',muted:'#6272a4',accent:'#bd93f9',kw:'#ff79c6',str:'#f1fa8c',com:'#6272a4',num:'#bd93f9',func:'#50fa7b',type:'#8be9fd',op:'#ff79c6',pre:'#ff79c6',name:'Dracula'},
+    tokyo:{bg:'#1a1b26',panel:'#16161e',border:'#2a2e3f',text:'#a9b1d6',muted:'#565f89',accent:'#7aa2f7',kw:'#bb9af7',str:'#9ece6a',com:'#565f89',num:'#ff9e64',func:'#7aa2f7',type:'#e0af68',op:'#89ddff',pre:'#e0af68',name:'Tokyo'}
+  };
+  const v=map[t]||map.vscode; const r=document.documentElement.style;
+  Object.keys(v).forEach(k=>{ if(k==='name') return; r.setProperty('--'+k, v[k]); });
+  document.querySelectorAll('.theme-group button').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('th-'+t); if(btn) btn.classList.add('active');
+  const st=document.getElementById('stTheme'); if(st) st.textContent='Giao diện: '+v.name;
+  showToast('Đã đổi giao diện: '+v.name);
+  refresh();
+}
+function runCode(){let lines=[]; const code=ta.value; const prints=[...code.matchAll(/print\((.*)\)/g)]; const couts=[...code.matchAll(/cout\s*<<\s*(.*?);/g)]; if(prints.length) prints.forEach(m=>lines.push(m[1].replace(/["']/g,'').replace(/,/g,' '))); if(couts.length) couts.forEach(m=>lines.push(m[1].replace(/<<\s*endl/g,'').replace(/"/g,'').replace(/<</g,' '))); if(!lines.length) lines.push('(Mô phỏng) Code đã chạy, không có print / cout.'); out.textContent='> Đang chạy '+document.getElementById('filename').value+'...\n'+lines.join('\n')+'\n> Xong!'; showToast('Đã chạy xong')}
+function clearOut(){out.textContent=''}
+function downloadCode(){let name=document.getElementById('filename').value.trim()||'main.py'; if(!name.includes('.')) name+=lang==='cpp'?'.cpp':lang==='python'?'.py':'.lua'; const blob=new Blob([ta.value],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); showToast('Đã tải: '+name);}
+function showToast(m){const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2200)}
+document.getElementById('fileInput').addEventListener('change',e=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ta.value=r.result; if(f.name.endsWith('.cpp')) setLang('cpp'); else if(f.name.endsWith('.lua')) setLang('lua'); else setLang('python'); document.getElementById('filename').value=f.name; refresh(); showToast('Đã mở: '+f.name)}; r.readAsText(f)});
+async function pastefyRaw(){
+  const code=ta.value;
+  if(!code.trim()){ showToast('Chưa có code để tạo Raw'); return; }
+  const btn=document.getElementById('pastefyBtn'); const old=btn.innerHTML; btn.textContent='Đang tạo...'; btn.disabled=true;
+  const title=document.getElementById('filename').value.trim()||'code';
+  try{
+    const res=await fetch('https://pastefy.app/api/v2/paste',{method:'POST', headers:{'Authorization':'Bearer '+PASTEFY_KEY, 'Content-Type':'application/json'}, body: JSON.stringify({title:title, content:code, type:lang, visibility:'UNLISTED'})});
+    if(!res.ok) throw new Error('Pastefy trả về '+res.status);
+    const data=await res.json();
+    const paste=data.paste||data;
+    const id=paste.id;
+    const raw=paste.raw_url || ('https://pastefy.app/'+id+'/raw');
+    lastPastefyRaw=raw;
+    document.getElementById('pastefyLink').value=raw;
+    document.getElementById('pastefyBar').classList.add('show');
+    await navigator.clipboard.writeText(raw);
+    showToast('Đã tạo Pastefy Raw, đã copy Raw link');
+  }catch(err){
+    const blob=new Blob([code],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob);
+    lastPastefyRaw=url; document.getElementById('pastefyLink').value='Lỗi Pastefy ('+err.message+') — bấm Mở Raw để xem raw tạm';
+    document.getElementById('pastefyBar').classList.add('show');
+    showToast('Không tạo được Pastefy, kiểm tra key/mạng. Bấm Mở Raw để xem raw tạm.');
+  }finally{ btn.innerHTML=old; btn.disabled=false; }
+}
+function copyPastefyLink(){ const v=document.getElementById('pastefyLink').value; if(!v) return; navigator.clipboard.writeText(v).then(()=>showToast('Đã copy Raw link')); }
+function openPastefyRaw(){ if(!lastPastefyRaw){ showToast('Chưa có Raw link, bấm Pastefy Raw trước'); return; } window.open(lastPastefyRaw,'_blank'); }
+refresh();
+</script>
+</body>
+</html>
